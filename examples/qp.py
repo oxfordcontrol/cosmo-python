@@ -22,7 +22,7 @@ x = np.array([1., 0])
 model.warm_start(x = x)
 
 # solve the problem
-model.solve()
+model.optimize()
 
 # query solution info
 obj_val = model.get_objective_value()

@@ -37,7 +37,7 @@ class Model:
             _COSMO.set_b(self.model, *unpacked_data, settings)
         self.setup_complete = True
 
-    def solve(self):
+    def optimize(self):
         """
         Solve conic problem and store result in self.result.
         """
