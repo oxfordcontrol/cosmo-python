@@ -17,7 +17,7 @@ with decision variables `x ϵ R^n`, `s ϵ R^m` and data matrices `P=P'>=0`, `q �
 </p>
 
 ## Installation
-The wrapper makes a call to Julia via the pyjulia interface. To make this work follow the steps:
+The wrapper makes a call to Julia via the pyjulia interface. To set this up:
 
 **On the Julia side:**
 
