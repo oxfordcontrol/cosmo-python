@@ -12,7 +12,7 @@ with decision variables `x ϵ R^n`, `s ϵ R^m` and data matrices `P=P'>=0`, `q �
 <p align="center">
   <a href="#example">Example</a> •
   <a href="#installation">Installation</a> •
-  <a href="https://oxfordcontrol.github.io/COSMO.jl/stable/">Documentation</a> •
+  <a href="https://oxfordcontrol.github.io/COSMO.jl/stable/">Main documentation</a> •
   <a href="https://github.com/oxfordcontrol/COSMO.jl">Main repository</a> 
 </p>
 
@@ -27,7 +27,7 @@ The wrapper makes a call to Julia via the pyjulia interface. To set this up:
 
 **On the Python side:**
 
-3. Install `pyjulia` the interface that lets you call Julia code from Python: `python3 -m pip install julia` 
+3. Install `pyjulia`, the interface that lets you call Julia code from Python: `python3 -m pip install julia` 
 
 4. In Python run `import julia` followed by `julia.install()` to finish the `pyjulia` setup.
 
@@ -35,7 +35,7 @@ The wrapper makes a call to Julia via the pyjulia interface. To set this up:
 
 
 ## Example
-This is a quick example to show the syntax of the wrapper. You can also use the example to verify that the steps in **Installation** were succesful. We want to solve the following quadratic program:
+This is a quick example to show the syntax of the interface. You can also use the example to verify that the steps in **Installation** were successful. Assume that we want to solve the following quadratic program:
 ```
 minimize 1/2 x' [4, 1; 1 2] x + [1;1]' x
 s.t.     A x == b 
@@ -75,12 +75,12 @@ x_opt = model.get_x() # query the optimal primal variable x_opt
 
 print("Solved with objective value: ", obj_val, " in", times["solver_time"], "s.")
 ```
-More examples can be found in [/examples](https://github.com/oxfordcontrol/cosmo-python/tree/master/examples)
+More examples can be found in [/examples](https://github.com/oxfordcontrol/cosmo-python/tree/master/examples).
 
 ## Documentation
-These notes only refer to the usage of this wrapper. For a general overview take a look at the [Documentation](https://oxfordcontrol.github.io/COSMO.jl/stable/) of the Julia package.
+These notes only refer to the usage of this interface. For a more general overview take a look at the [Documentation](https://oxfordcontrol.github.io/COSMO.jl/stable/) of the Julia package.
 
-A `Model` is a thin Python class that wraps a `COSMO.Model` type in Julia.
+A `Model` is a thin Python class that wraps a `COSMO.Model`-type in Julia.
 ```python
 import cosmopy as cosmo
 model = cosmo.Model()
@@ -90,7 +90,7 @@ The function `setup` copies the problem data and settings to the model:
 def setup(P = None, q = None, A = None, b = None, cone = None, settings**)
 ```
 The input to the function should be:
-- `P`, `A`: `scipy.sparse.csc_matrix`. Note that for PSD constraints the off-diagonals of A have to be scaled appropriately (see details below).
+- `P`, `A`: `scipy.sparse.csc_matrix`. Note that for PSD constraints the off-diagonals of `A` have to be scaled appropriately (see details below).
 - `q`, `b`: `np.array`
 - `cone`: A dictionary that holds the dimensions of the conic constraints in the following order and corresponding to the rows in `A` (following SCS convention):
 
@@ -100,22 +100,22 @@ The input to the function should be:
 | "f"      | number of equality constraints | zero cone |  `COSMO.ZeroSet` |
 | "l"      | number of inequality constraints |  nonegative orthant | `COSMO.Nonnegatives` |
 | "q" | list of SOC sizes  | second order cone(s) | `COSMO.SecondOrderCone` |
-| "s" | list of SDP sizes  | PSD cone | `COSMO.PsdConeTriangle` |
+| "s" | list of SDP sizes  | psd cone | `COSMO.PsdConeTriangle` |
 | "ep" | number of primal exp cones  | exp cone (p) | `COSMO.ExponentialCone` |
 | "ed" | number of dual exp cones  | exp cone (d) | `COSMO.DualExponentialCone` |
-| "p" | list of power cone parameters (neg value for dual)  | PSD cone | `COSMO.PowerCone` |
+| "p" | list of power cone parameters (neg value for dual)  | 3d-power cone | `COSMO.PowerCone` |
 
 So if you want to create a problem with 2 equality constraints, 3 inequality constraints, 2 SOC-constraints of dim 3, 1 PSD-constraint for a 3x3 matrix, 1 PSD-constraint for a 4x4 matrix, 2 primal exponential cones, 1 dual exponential cone, 2 primal power cones with exponent `0.3` and `0.4` and one dual exponential cone with exponent `0.5`, define `cone` as follows:
 ```python
 cone = {"f" : 2, "l" : 3, "q" : [3, 3], "s" : [6, 10], "ep" : 2, "ed": 1, "p" : [0.3, 0.4, -0.5] }
 ```
 
-The solver settings can be passed into `setup` as key-value arguments. A list of all solver settings can be found [here](https://oxfordcontrol.github.io/COSMO.jl/stable/getting_started/#Settings-1). The only difference is that settings related to the `kkt_solver` and to the `merge_strategy` keys have to be passed as strings. So if you want to configure `COSMO` to use max 5000 iterations, the QDLDL solver for the linear system and the ParentChild clique merging strategy pass the following:
+The solver settings can be passed into `setup` as key-value arguments. A list of available solver settings can be found [here](https://oxfordcontrol.github.io/COSMO.jl/stable/getting_started/#Settings-1). The only difference is that settings related to the `kkt_solver` and to the `merge_strategy` keys have to be passed as strings. So if you want to configure `COSMO` to use 5000 max  iterations, the QDLDL solver for the linear system and the ParentChild clique merging strategy pass the following:
 ```python
 model.setup(..., max_iter = 5000, kkt_solver = "QDLDLKKTSolver", merge_strategy = "ParentChildMerge")
 ```
 
-Before we attempt to solve the problem, we can provide COSMO with initial guesses for the primal `x` and dual variables `y`:
+Before we attempt to solve the problem, we can provide COSMO with initial guesses for the primal variable `x` and dual variable `y`:
 ```python
 def warm_start(self, x=None, y=None):
 ```
@@ -134,10 +134,13 @@ def get_s(self): #optimal slack variable
 
 def get_status(self): #solution status
 
-def get_iter(self): #number of iterations of algoritm
+def get_iter(self): #number of iterations of algorithm
 
-def get_times(self): #dict of timing information
+def get_times(self): #dict with timing information
 ```
+
+## Performance
+We advise to read the [Performance Tips](https://oxfordcontrol.github.io/COSMO.jl/stable/performance/) page. In particular, when COSMO is called from a python script, e.g. `python3 solve_problem.py` Julia will *just-in-time* compile the solver code which will slow down the overall execution. For larger problems it is advisable to solve a mini problem first to trigger the JIT-compilation and get full performance on the subsequent solve of the actual problem .
 
 ## Licence
 This project is licensed under the Apache License - see the [LICENSE.md](LICENSE.md) file for details.
