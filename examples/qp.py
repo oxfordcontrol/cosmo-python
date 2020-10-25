@@ -1,4 +1,4 @@
-# test model creation in Python
+# Solving a QP with cosmopy
 import sys
 sys.path.append('../')
 import cosmopy as cosmo
