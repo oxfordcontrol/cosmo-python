@@ -16,8 +16,12 @@ def get_dimension(cone):
             dim += cone[k]
         elif k == "q" or k == "s":
             dim += sum(cone[k])
-        elif k == "ep" or k == "ed" or k == "p":
+        elif k == "ep" or k == "ed":
+            dim += cone[k] * 3
+        elif k == "p":
             dim += len(cone[k]) * 3
+        else:
+            raise ValueError("cone key unknown.")
     return dim
 
 

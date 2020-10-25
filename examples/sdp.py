@@ -21,14 +21,14 @@ from math import sqrt
 #
 # turn this into solver format:
 # x is the upper triangle of X
-# min sven(C) * x
-# svec(A1)' * x == b1
-# svec(A2)' * x == b2
+# min upper(C) * x
+# upper(A1)' * x == b1
+# upper(A2)' * x == b2
 # mat(x) is PsdConeTriangle
 
 # take the upper triangles of the problem data
 n = 6
-q = np.array([1., 4, 9, 6, 0, 7]) #svec(C)
+q = np.array([1., 4, 9, 6, 0, 7]) #upper(C)
 
 # equality constraints: Aj_t * x + s == bj, s in {0}
 b = np.hstack((np.array([11., 19.]), np.zeros(6)))
@@ -55,6 +55,8 @@ opt_obj_val = model.get_objective_value()
 
 # get optimal X*
 xopt = model.get_x()
+
+# populate a matrix Xopt with the upper triangular entries and symmetrize
 Xopt = np.zeros((3, 3))
 Xopt[np.triu_indices(3, 0)] = xopt
 Xopt = Xopt + np.tril(Xopt.T, -1)
