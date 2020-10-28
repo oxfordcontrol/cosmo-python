@@ -19,6 +19,8 @@ before_install:
   - export PATH="$HOME/julia/bin:$PATH"
 
   - pip install --quiet tox
+  - julia -e 'using Pkg; Pkg.add("COSMO"); Pkg.add("PyCall");'
+
 script:
 
   # Create an environment first so that we know what to use for $PYTHON:
