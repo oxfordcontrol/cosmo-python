@@ -20,18 +20,20 @@ def get_dimension(cone):
             dim += cone[k] * 3
         elif k == "p":
             dim += len(cone[k]) * 3
+        elif k == "b":
+            dim += cone[k]
         else:
             raise ValueError("cone key unknown.")
     return dim
 
 
-def prepare_data(P = None, q = None, A = None ,b = None, cone = None):
+def prepare_data(P = None, q = None, A = None, b = None, cone = None, l = None, u = None):
         """
         Prepare problem data of the form
 
         minimize     1/2 x' * P * x + q' * x
         subject to   A * x + s == b, s in cone
-
+                    A[b] * x + sb == b[b], l <= sb <= u
         solver settings can be specified as additional keyword arguments
         """
 
@@ -72,7 +74,7 @@ def prepare_data(P = None, q = None, A = None ,b = None, cone = None):
             raise ValueError("Incorrect dimension of q")
         if len(b) != m:
             raise ValueError("Incorrect dimension of b")
-
+        
         if not type(cone) is dict:
             raise TypeError("cone has to be a dictionary of dimensions of the conic constraints.")
 
@@ -104,5 +106,14 @@ def prepare_data(P = None, q = None, A = None ,b = None, cone = None):
         if not A.has_sorted_indices:
             A.sort_indices()
 
+        # check any potential box constraints
+        if "b" in cone.keys():
+            if len(u) != cone["b"]:
+                raise ValueError("Dimension of supplied box constraint dimension cone[b] doesn't match length of boundary vector u.")
+            if len(l) != cone["b"]:
+                raise ValueError("Dimension of supplied box constraint dimension cone[b] doesn't match length of boundary vector l.")
+        else:
+            l = None
+            u = None
 
-        return (P.indices, P.indptr, P.data, q, A.indices, A.indptr, A.data, b, cone, m, n)
+        return (P.indices, P.indptr, P.data, q, A.indices, A.indptr, A.data, b, cone, l, u, m, n)

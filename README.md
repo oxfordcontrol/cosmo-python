@@ -25,7 +25,7 @@ The wrapper makes a call to Julia via the pyjulia interface. To set this up:
 
 1. Install the *Julia* programming language (`v1.5+` recommended) [[Julia Download page]](https://julialang.org/downloads/)
 
-2. Open the Julia REPL and install the Julia package `COSMO.jl`: `(type ]): pkg> add COSMO` (at least `v0.7.6+`)
+2. Open the Julia REPL and install the Julia package `COSMO.jl`: `(type ]): pkg> add COSMO` (at least `v0.7.7+`)
 
 **On the Python side:**
 
@@ -89,7 +89,7 @@ model = cosmo.Model()
 ```
 The function `setup` copies the problem data and settings to the model:
 ```python
-def setup(P = None, q = None, A = None, b = None, cone = None, settings**)
+def setup(P = None, q = None, A = None, b = None, cone = None, l = None, u = None, settings**)
 ```
 The input to the function should be:
 - `P`, `A`: `scipy.sparse.csc_matrix`. Note that for PSD constraints the off-diagonals of `A` have to be scaled appropriately (see details below).
@@ -106,11 +106,13 @@ The input to the function should be:
 | "ep" | number of primal exp cones  | exp cone (p) | `COSMO.ExponentialCone` |
 | "ed" | number of dual exp cones  | exp cone (d) | `COSMO.DualExponentialCone` |
 | "p" | list of power cone parameters (neg value for dual)  | 3d-power cone | `COSMO.PowerCone` |
+| "b" | number of intervall constraints l <= A x + b <= u  | box constraint | `COSMO.Box(l, u)` |
 
-So if you want to create a problem with 2 equality constraints, 3 inequality constraints, 2 SOC-constraints of dim 3, 1 PSD-constraint for a 3x3 matrix, 1 PSD-constraint for a 4x4 matrix, 2 primal exponential cones, 1 dual exponential cone, 2 primal power cones with exponent `0.3` and `0.4` and one dual exponential cone with exponent `0.5`, define `cone` as follows:
+So if you want to create a problem with 2 equality constraints, 3 inequality constraints, 2 SOC-constraints of dim 3, 1 PSD-constraint for a 3x3 matrix, 1 PSD-constraint for a 4x4 matrix, 2 primal exponential cones, 1 dual exponential cone, 2 primal power cones with exponent `0.3` and `0.4`, one dual power cone with exponent `0.5` and a box constraint of dim 3, define `cone` as follows:
 ```python
-cone = {"f" : 2, "l" : 3, "q" : [3, 3], "s" : [6, 10], "ep" : 2, "ed": 1, "p" : [0.3, 0.4, -0.5] }
+cone = {"f" : 2, "l" : 3, "q" : [3, 3], "s" : [6, 10], "ep" : 2, "ed": 1, "p" : [0.3, 0.4, -0.5], "b" : 3}
 ```
+- `l`, `u`: `np.array` boundary vectors defining the box constraint `l <= s <= u`. `len(u) = len(l)` have to correspond to the corresponding cone entry `cone["b"]`
 
 The solver settings can be passed into `setup` as key-value arguments. A list of available solver settings can be found [here](https://oxfordcontrol.github.io/COSMO.jl/stable/getting_started/#Settings-1). The only difference is that settings related to the `kkt_solver` and to the `merge_strategy` keys have to be passed as strings. So if you want to configure `COSMO` to use 5000 max  iterations, the QDLDL solver for the linear system and the ParentChild clique merging strategy pass the following:
 ```python

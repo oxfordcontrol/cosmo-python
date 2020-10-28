@@ -172,3 +172,24 @@ class basic_tests(unittest.TestCase):
         self.assertEqual(status, 'Solved')
         nptest.assert_almost_equal(obj_val, -1.8458, decimal = 3)
 
+    def test_box_QP(self):
+        # min  1/2 x'Px + q'X
+        # s.t. l <= A x + b <= u
+        q = np.array([1., 1.])
+        P = sparse.csc_matrix([[4., 1], [1, 2]])
+        A = -sparse.csc_matrix([[1., 1], [1, 0.], [0., 1]]) # s = -Ax + b, l <= s <= u
+        b = np.zeros(3)
+        l = np.array([1., 0, 0])
+        u = np.array([1., 0.7, 0.7])
+        cone = {"b" : 3}
+
+        model = cosmo.Model()
+        model.setup(P = P, q = q, A = A, b = b, cone = cone, l = l, u = u, eps_abs = 1e-5, eps_rel = 1e-5, scaling = 0)
+        model.optimize()
+        obj_val = model.get_objective_value()
+        status = model.get_status()
+        x  = model.get_x()
+
+        self.assertEqual(status, 'Solved')
+        nptest.assert_almost_equal(obj_val, 1.88)
+        nptest.assert_array_almost_equal(x, np.array([0.3, 0.7]), decimal = 3)

@@ -28,14 +28,15 @@ class Model:
         """
         _COSMO.print_version()
 
-    def setup(self, P = None, q = None, A = None, b = None, cone = None, **settings):
+    def setup(self, P = None, q = None, A = None, b = None, cone = None, l = None, u = None, **settings):
         """
         Setup COSMO solver problem of the form
             minimize     1/2 x' * P * x + q' * x
             subject to   A * x + s == b, s in cone
+                         A[b] * x + sb == b[b], l <= sb <= u
         solver settings can be specified as additional keyword arguments
         """
-        unpacked_data = utils.prepare_data(P, q, A, b, cone)
+        unpacked_data = utils.prepare_data(P, q, A, b, cone, l, u)
         if settings == None:
             # create standard settings in julia
             _COSMO.set_b(self.model, *unpacked_data)
