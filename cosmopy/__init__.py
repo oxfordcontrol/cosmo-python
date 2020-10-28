@@ -7,6 +7,6 @@ from cosmopy.interface import *
 
 def install():
     """
-    Install Julia packages required for diffeqpy.
+    Install Julia packages required for cosmopy.
     """
     subprocess.check_call(['julia', os.path.join(script_dir, 'install.jl')])
