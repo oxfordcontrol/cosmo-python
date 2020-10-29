@@ -105,8 +105,8 @@ The input to the function should be:
 | "s" | list of SDP sizes  | psd cone | `COSMO.PsdConeTriangle` |
 | "ep" | number of primal exp cones  | exp cone (p) | `COSMO.ExponentialCone` |
 | "ed" | number of dual exp cones  | exp cone (d) | `COSMO.DualExponentialCone` |
-| "p" | list of power cone parameters (neg value for dual)  | 3d-power cone | `COSMO.PowerCone` |
-| "b" | number of intervall constraints l <= A x + b <= u  | box constraint | `COSMO.Box(l, u)` |
+| "p" | list of power cone parameters (neg value for dual)  | 3d-power cone | `COSMO.PowerCone` and `COSMO.DualPowerCone`|
+| "b" | number of intervall constraints `l <= s <= u`  | box constraint | `COSMO.Box(l, u)` |
 
 So if you want to create a problem with 2 equality constraints, 3 inequality constraints, 2 SOC-constraints of dim 3, 1 PSD-constraint for a 3x3 matrix, 1 PSD-constraint for a 4x4 matrix, 2 primal exponential cones, 1 dual exponential cone, 2 primal power cones with exponent `0.3` and `0.4`, one dual power cone with exponent `0.5` and a box constraint of dim 3, define `cone` as follows:
 ```python
